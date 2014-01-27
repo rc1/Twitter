@@ -10,6 +10,8 @@ var util = require('util');
 // All the options `save` to save all the images to a disk 
 var optimist = require('optimist')
     .usage( 'Usage: $0' )
+    .alias( 'a', 'all' )
+    .alias( 'd', 'dir' )
     .alias( 'u', 'upload' ) 
     .alias( 'w', 'write' )
     .alias( 'k', 'consumer-key' ) 
@@ -17,9 +19,11 @@ var optimist = require('optimist')
     .alias( 'a', 'access-token' ) 
     .alias( 't', 'access-token-secret' ) 
     .describe( 'u', 'Upload the image to twitter' )
-    .describe( 'w', 'Write the image to avatar.png' );
+    .describe( 'w', 'Write the image to avatar.png' )
+    .describe( 'a', 'Write all (365 days) images to a dir' )
+    .describe( 'd', 'Folder for writing all images to' );
 var argv = optimist.argv; 
-if ( !argv.w && !argv.u ) {
+if ( !argv.w && !argv.u && !argv.a ) {
     optimist.showHelp();
     return;
 }
@@ -31,17 +35,29 @@ if ( argv.u && !( argv.k && argv.s && argv.a && argv.t ) ) {
 
 // # Main
 
+// Create them all if nessicary
+
+if ( argv.a ) {
+    console.log( "going to save to", argv.d );
+    for ( var i=1; i < 365; i++ ) {
+        // Create the canvas
+        var canvas = new Canvas( 73, 73 );  
+        var ctx = canvas.getContext( '2d' );
+        renderer( ctx, {  day : i, width : 73, height : 73 } );
+        saveCanvasToDisk( canvas, ''+i );
+    }
+}
+
 // Create the canvas
 var canvas = new Canvas( 48, 48 );  
 var ctx = canvas.getContext( '2d' );
 
 // Style it based on the day
 var day = getCurrentDay();
-
-renderer( ctx, {  day : 13, width : 48, height : 48 } );
+renderer( ctx, {  day : day, width : 48, height : 48 } );
 
 if ( argv.write ) {
-    saveCanavsToDisk( canvas, 'avatar' );
+    saveCanvasToDisk( canvas, 'avatar' );
 }
 if ( argv.upload ) {
 
@@ -122,8 +138,8 @@ function getCurrentDay() {
     return day;
 }
 
-function saveCanavsToDisk( canvas, filename ) {
-    var out = fs.createWriteStream( __dirname + '/' + filename + '.png' );
+function saveCanvasToDisk( canvas, filename ) {
+    var out = fs.createWriteStream( (argv.d || __dirname) + '/' + filename + '.png' );
     var stream = canvas.pngStream();
     stream.on( 'data', function ( chunk ) {
         out.write( chunk );
