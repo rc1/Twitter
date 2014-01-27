@@ -1,4 +1,5 @@
 script-upload-to-dev-account.sh
+script-upload-to-account.sh
 node_modules
 app/public/img/*
 !app/public/img/.gitkeep
