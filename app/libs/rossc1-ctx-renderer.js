@@ -27,7 +27,7 @@ function rossC1CtxRenderer( ctx, options ) {
 
 function stripe( ctx, width, height, thickness, step ) {
     ctx.fillStyle = 'rgba(255,255,255,1.0)';
-    for ( var x = 0; x < width; x += step + thickness ) {
+    for ( var x = step; x < width; x += step + thickness ) {
         ctx.fillRect( x, 0, thickness, height );
     }
     // for ( var y = 0; y < height; y += step + thickness ) {

@@ -23,7 +23,7 @@ var optimist = require('optimist')
     .describe( 'm', 'Make all (365 days) images to a dir' )
     .describe( 'd', 'Folder for making all images to' );
 var argv = optimist.argv; 
-if ( !argv.w && !argv.u && !argv.a ) {
+if ( !argv.w && !argv.u && !argv.m ) {
     optimist.showHelp();
     return;
 }

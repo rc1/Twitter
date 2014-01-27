@@ -1,0 +1,17 @@
+doctype html
+html(lang="en")
+    head
+        link( rel='stylesheet', type='text/css', href='/css/style.css' )
+    body
+        #content
+            h1 Twitter Avatars 
+                span for 
+                    a( href='http://twitter.com/rossc1' ) @rossc1
+            #avatars
+                - for ( var i = 1; i < 366; ++i )
+                    .avatar
+                        img( src='/day/'+i+'.png' )
+                        //- img( src='/img/'+i+'.png' )
+                        .desc Day: #{i}
+            script( src='/js/jquery-2.1.0.min.js' )
+            script( src='/js/main.js' )
