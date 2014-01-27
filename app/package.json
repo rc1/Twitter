@@ -8,6 +8,7 @@
     "less-middleware": "~0.1.15",
     "express": "~3.4.8",
     "optimist": "~0.6.0",
-    "twit": "~1.1.12"
+    "node-twitter": "~0.5.0",
+    "oauth": "~0.9.11"
   }
 }

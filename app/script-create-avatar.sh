@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
 // # Modules
-var Twit = require( 'twit' );
+var OAuth = require( 'oauth' );
+var https = require( 'https' );
 var renderer = require( './libs/rossc1-ctx-renderer' );
 var Canvas = require( 'canvas' );
 var fs = require('fs');
@@ -31,28 +32,19 @@ if ( argv.u && !( argv.k && argv.s && argv.a && argv.t ) ) {
 // # Main
 
 // Create the canvas
-var canvas = new Canvas( 73, 73 );  
+var canvas = new Canvas( 48, 48 );  
 var ctx = canvas.getContext( '2d' );
 
 // Style it based on the day
 var day = getCurrentDay();
 
-renderer( ctx, {  day : day } );
+renderer( ctx, {  day : 13, width : 48, height : 48 } );
 
 if ( argv.write ) {
     saveCanavsToDisk( canvas, 'avatar' );
 }
 if ( argv.upload ) {
 
-    // Set the twitter access details
-    var twit = new Twit({
-        consumer_key :         argv.k,
-        consumer_secret :      argv.s,
-        access_token :         argv.a,
-        access_token_secret :  argv.t
-    });
-
-    // Convert the canvas into base64 image
     canvas.toBuffer( function( err, buf ) {
 
         if ( err ) {
@@ -60,24 +52,64 @@ if ( argv.upload ) {
             return;
         }
 
-        twit.post( 'account/update_profile_image', {
-            image : buf.toString('base64')
-        }, function (err, reply) { 
-            if ( err ) {
-                console.error( 'Failed to post image' );
-                console.log( util.inspect( err, { showHidden: false, depth: null, colors: true } ) );
-                console.log( util.inspect( reply, { showHidden: false, depth: null, colors: true } ) );
-                return;
-            }
-            console.log( 'updated image' );
+        var oauth = new OAuth.OAuth(
+            'https://api.twitter.com/oauth/request_token',
+            'https://api.twitter.com/oauth/access_token',
+            argv.k, argv.s,
+            '1.0', null, 'HMAC-SHA1');
+
+        var crlf = "\r\n";
+        var boundary = '---------------------------10102754414578508781458777923';
+
+        var separator = '--' + boundary;
+        var footer = crlf + separator + '--' + crlf;
+
+        var contents = separator + crlf
+            + 'Content-Disposition: file; name="image";' +  crlf
+            + 'Content-Type: image/png' +  crlf
+            + crlf;
+
+        var multipartBody = Buffer.concat( [ new Buffer(contents), buf, new Buffer(footer) ] );
+
+        var hostname = 'api.twitter.com';
+        var authorization = oauth.authHeader(
+            'https://api.twitter.com/1.1/account/update_profile_image.json',
+            argv.a, argv.t, 'POST');
+
+        var headers = {
+            'Authorization': authorization,
+            'Content-Type': 'multipart/form-data; boundary=' + boundary,
+            'Host': hostname,
+            'Content-Length': multipartBody.length,
+            'Connection': 'Keep-Alive'
+        };
+
+        var options = {
+            host: hostname,
+            port: 443,
+            path: '/1.1/account/update_profile_image.json',
+            method: 'POST',
+            headers: headers
+        };
+
+        var request = https.request(options);     
+        request.write(multipartBody);
+        request.end();
+
+        request.on('error', function (err) {
+            console.log('Error: Something is wrong.\n'+JSON.stringify(err)+'\n');
         });
 
+        request.on('response', function (response) {            
+            response.setEncoding('utf8');            
+            response.on('data', function (chunk) {
+                console.log(chunk.toString());
+            });
+            response.on('end', function () {
+                console.log(response.statusCode +'\n');
+            });
+        });    
     });
-    
-
-
-   
-
 }
 
 // # Utils

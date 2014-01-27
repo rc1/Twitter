@@ -3,10 +3,10 @@
 
 function rossC1CtxRenderer( ctx, options ) {
 
-    var daysInHueCycle = (typeof options.daysInHueCycle === 'undefined') ? 40 : options.daysInHueCycle;
+    var daysInHueCycle = (typeof options.daysInHueCycle === 'undefined') ? 12 : options.daysInHueCycle;
 
     var hue = Math.floor( ((options.day-1)/daysInHueCycle) * 360 );
-    var hueStep = (typeof options.hueStep === 'undefined') ? 10 : options.hueStep;
+    var hueStep = (typeof options.hueStep === 'undefined') ? 50 : options.hueStep;
     var nextHue = hue + hueStep;
 
     var width = options.width || 73;
