@@ -39,7 +39,7 @@ if ( argv.u && !( argv.k && argv.s && argv.a && argv.t ) ) {
 
 if ( argv.a ) {
     console.log( "going to save to", argv.d );
-    for ( var i=1; i < 365; i++ ) {
+    for ( var i=1; i <= 365; i++ ) {
         // Create the canvas
         var canvas = new Canvas( 73, 73 );  
         var ctx = canvas.getContext( '2d' );
