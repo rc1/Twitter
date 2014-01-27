@@ -1,3 +1,3 @@
 #!/bin/sh
 
-./script-create-avatar.sh -a -d ./public/img/
+./script-create-avatar.sh -m -d ./public/img/
