@@ -10,7 +10,7 @@ var util = require('util');
 // All the options `save` to save all the images to a disk 
 var optimist = require('optimist')
     .usage( 'Usage: $0' )
-    .alias( 'a', 'all' )
+    .alias( 'm', 'make-all' )
     .alias( 'd', 'dir' )
     .alias( 'u', 'upload' ) 
     .alias( 'w', 'write' )
@@ -20,8 +20,8 @@ var optimist = require('optimist')
     .alias( 't', 'access-token-secret' ) 
     .describe( 'u', 'Upload the image to twitter' )
     .describe( 'w', 'Write the image to avatar.png' )
-    .describe( 'a', 'Write all (365 days) images to a dir' )
-    .describe( 'd', 'Folder for writing all images to' );
+    .describe( 'm', 'Make all (365 days) images to a dir' )
+    .describe( 'd', 'Folder for making all images to' );
 var argv = optimist.argv; 
 if ( !argv.w && !argv.u && !argv.a ) {
     optimist.showHelp();
@@ -37,8 +37,7 @@ if ( argv.u && !( argv.k && argv.s && argv.a && argv.t ) ) {
 
 // Create them all if nessicary
 
-if ( argv.a ) {
-    console.log( "going to save to", argv.d );
+if ( argv.m ) {
     for ( var i=1; i <= 365; i++ ) {
         // Create the canvas
         var canvas = new Canvas( 73, 73 );  
