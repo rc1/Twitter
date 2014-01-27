@@ -10,7 +10,8 @@ html(lang="en")
             #avatars
                 - for ( var i = 1; i < 366; ++i )
                     .avatar
-                        img( src='/day/'+i+'.png' )
+                        //- img( src='/day/'+i+'.png' )
+                        img( src='/img/'+i+'.png' )
                         .desc Day: #{i}
             script( src='/js/jquery-2.1.0.min.js' )
             script( src='/js/main.js' )
