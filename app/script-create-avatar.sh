@@ -13,6 +13,7 @@ var optimist = require('optimist')
     .alias( 'm', 'make-all' )
     .alias( 'd', 'dir' )
     .alias( 'u', 'upload' ) 
+    .alias( 'n', 'change-name' ) 
     .alias( 'w', 'write' )
     .alias( 'k', 'consumer-key' ) 
     .alias( 's', 'consumer-secret' ) 
@@ -35,7 +36,7 @@ if ( argv.u && !( argv.k && argv.s && argv.a && argv.t ) ) {
 
 // # Main
 
-// Create them all if nessicary
+// Create them all if necessary
 
 if ( argv.m ) {
     for ( var i=1; i <= 365; i++ ) {
@@ -127,7 +128,34 @@ if ( argv.upload ) {
     });
 }
 
+if ( argv[ 'change-name' ] ) {
+
+    // Get the name like R_ss C___rns
+    var name = getRandomSensoredName( argv[ 'change-name' ] );
+
+    // Use the twit library to update it
+    var Twit = require( 'twit' );
+
+    var twit = new Twit( {
+        consumer_key: argv.k,
+        consumer_secret: argv.s,
+        access_token: argv.a,
+        access_token_secret: argv.t
+    });
+
+    twit.post( 'account/update_profile', { name: name }, function( err, data, response ) {
+        if ( err ) {
+            console.error( 'failed to change name' );
+        }
+    });
+}
+  
 // # Utils
+function getRandomSensoredName ( name ) {
+    return name.split('').map(function(c){ if (c===' ') { return c; } else { return Math.random() > 0.8 ? c : '_' ; } }).join('');
+}
+
+
 function getCurrentDay() {
     var now = new Date();
     var start = new Date(now.getFullYear(), 0, 0);
