@@ -7,7 +7,8 @@ var util = require( 'util' );
 // # Express
 var express = require( 'express' );
 var jadeMiddleware = require( './libs/jade-middleware' );
-var lessMiddleware = require('less-middleware');
+var lessMiddleware = require( 'less-middleware' );
+var routeCache = require( 'route-cache' );
 // ## Server
 var app = express();
 app.use( app.router );
@@ -33,19 +34,18 @@ app.use(function(err, req, res, next) {
     res.send(500, { status:500, message: 'internal error', type:'internal', error:err });
 });
 
-app.get( '/day/:day.png', function ( req, res ) {
-
-	var canvas = new Canvas( 73, 73 ); 	
-	var ctx = canvas.getContext( '2d' );
-
-	renderer( ctx, { 
-		day: req.params.day
-	} );
-
-	res.set( 'Content-Type', 'image/png' ); 
-
-	canvas.createPNGStream().pipe( res );
-
+app.get( '/day/:day.png', routeCache.cacheSeconds( 60 * 60 * 60 * 60  ), function ( req, res ) {
+    var canvas = new Canvas( 73, 73 ); 	
+    var ctx = canvas.getContext( '2d' );
+    renderer( ctx, { 
+	day: req.params.day
+    });
+    res.set( 'Content-Type', 'image/png' ); 
+    // canvas.createPNGStream().pipe( res );
+    
+    canvas.toBuffer( function( err, buf ) {
+         res.send( buf );
+    });
 });
 
 // ## Server
